@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elo Comparison Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: #000064;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .container {
+      background-color: #000064;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px white;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    h1, h2 , h3{
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: initial;
+      font-weight: 1000;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px #ffffff;
+    }
+
+    label, .slider-label, .input-label {
+      display: block;
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 2px solid #ffffff;
+      background-color: #000064;
+      color: #ffffff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .player-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .player-a-text { color: cyan; text-shadow: 0 0 5px cyan; }
+    .player-b-text { color: red; text-shadow: 0 0 5px red; }
+    .player-draw-text { color: white; text-shadow: 0 0 5px white; }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .button-container button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 2px solid #ffffff;
+      background: #000064;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .button-container button:hover {
+      background: #ffffff;
+      color: #000064;
+      border-color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .result-group, #eloOutput, #evalBar {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .warning { color: #808080; font-size: 12px; display: none; }
+
+    /* EQ classes */
+    .eq-blunder { color: #ff0000; }
+    .eq-mistake { color: #ff8000; }
+    .eq-inaccuracy { color: #ffff00; }
+    .eq-good { color: #80ff00; }
+    .eq-best { color: #00ff00; }
+    .eq-great { color: #0080ff; }
+    .eq-brilliant { color: #00ff80; }
+    .eq-magnificent { color: #00ffff; }
+    .eq-legendary { color: #0000ff; }
+
+    /* Move classes */
+/* Base style for all move icons */
+.Move-blunder, .Move-mistake, .Move-inaccuracy,
+.Move-good, .Move-best, .Move-great,
+.Move-brilliant, .Move-magnificent, .Move-legendary {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 0 6px;
+  vertical-align: middle;
+}
+
+/* Individual stickers */
+.Move-blunder { background-image: url('file:///C:/Users/shrey/OneDrive/Blunder%20Sticker.png'); color: #ff0000; }
+.Move-mistake { background-image: url('file:///C:/Users/shrey/OneDrive/Mistake%20Sticker.png'); color: #ff8000; }
+.Move-inaccuracy { background-image: url('file:///C:/Users/shrey/OneDrive/Inaccuracy%20Sticker.png'); color: #ffff00; }
+.Move-good { background-image: url('file:///C:/Users/shrey/OneDrive/Good%20Move%20Sticker.png'); color: #80ff00; }
+.Move-best { background-image: url('file:///C:/Users/shrey/OneDrive/Best%20Move%20Sticker.png'); color: #00ff00; }
+.Move-great { background-image: url('file:///C:/Users/shrey/OneDrive/Great%20Move%20Sticker.png'); color: #0080ff; }
+.Move-brilliant { background-image: url('file:///C:/Users/shrey/OneDrive/Brilliant%20Move%20Sticker.png'); color: #00ff80; }
+.Move-magnificent { background-image: url('file:///C:/Users/shrey/OneDrive/Magnificent%20Move%20Sticker.png'); color: #00ffff; }
+.Move-legendary { background-image: url('file:///C:/Users/shrey/OneDrive/Legendary%20Move%20Sticker.png'); color: #0000ff; }
+
+
+    .white { color: cyan; }
+    .black { color: red; }
+    .label { display: block; margin-top: 5px; color: #ffffff; }
+
+    .move-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>UTTT Elo Comparison Tool</h1>
+    <h3>This tool is used in the game "Ultimate Tic Tac Toe".</h3>
+    <h2>Elo Calculator</h2>
+    <div class="player-inputs">
+      <div>
+        <label class="player-a-text">Player X Elo (1-9999):</label>
+        <input type="number" id="ratingA" value="2500" min="1" max="9999">
+        <label class="player-a-text">K Factor X:</label>
+        <input type="number" id="kFactorA" value="20" min="10" max="40">
+        <span id="ratingA-warning" class="warning"></span>
+        <span id="kFactorA-warning" class="warning"></span>
+      </div>
+
+      <div>
+        <label class="player-b-text">Player O Elo (1-9999):</label>
+        <input type="number" id="ratingB" value="2500" min="1" max="9999">
+        <label class="player-b-text">K Factor O:</label>
+        <input type="number" id="kFactorB" value="20" min="10" max="40">
+        <span id="ratingB-warning" class="warning"></span>
+        <span id="kFactorB-warning" class="warning"></span>
+      </div>
+    </div>
+
+    <label>Game Result:</label>
+    <select id="result">
+      <option value="winA" class="player-a-text">Player X Wins</option>
+      <option value="winB" class="player-b-text">Player O Wins</option>
+      <option value="draw" class="player-draw-text">Draw</option>
+    </select>
+
+    <div class="button-container">
+      <button id="calculateBtn">Calculate New Ratings</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <div class="result-group">
+      <h3>New Ratings:</h3>
+      <p><span class="player-a-text">X Elo:</span> <span id="newRatingA"></span></p>
+      <p><span class="player-b-text">O Elo:</span> <span id="newRatingB"></span></p>
+    </div>
+
+    <hr>
+    <h2>Move Classification Performance</h2>
+
+    <div class="move-inputs">
+      <div><label>X Blunders:</label><span class="Move-blunder"></span><input type="number" id="whiteBlunders" value="0" min="0"></div>
+      <div><label>O Blunders:</label><span class="Move-blunder"></span><input type="number" id="blackBlunders" value="0" min="0"></div>
+      <span id="whiteblunders-warning" class="warning"></span>
+      <span id="blackblunders-warning" class="warning"></span>
+
+      <div><label>X Mistakes:</label><span class="Move-mistake"></span><input type="number" id="whiteMistakes" value="0" min="0"></div>
+      <div><label>O Mistakes:</label><span class="Move-mistake"></span><input type="number" id="blackMistakes" value="0" min="0"></div>
+      <span id="whiteMistakes-warning" class="warning"></span>
+      <span id="blackMistakes-warning" class="warning"></span>
+
+      <div><label>X Inaccuracies:</label><span class="Move-inaccuracy"></span><input type="number" id="whiteInaccuracies" value="0" min="0"></div>
+      <div><label>O Inaccuracies:</label><span class="Move-inaccuracy"></span><input type="number" id="blackInaccuracies" value="0" min="0"></div>
+      <span id="whiteInaccuracies-warning" class="warning"></span>
+      <span id="blackInaccuracies-warning" class="warning"></span>
+
+      <div><label>X Good Moves:</label><span class="Move-good"></span><input type="number" id="whiteGood" value="0" min="0"></div>
+      <div><label>O Good Moves:</label><span class="Move-good"></span><input type="number" id="blackGood" value="0" min="0"></div>
+      <span id="whiteGood-warning" class="warning"></span>
+      <span id="blackGood-warning" class="warning"></span>
+
+      <div><label>X Best Moves:</label><span class="Move-best"></span><input type="number" id="whiteBest" value="0" min="0"></div>
+      <div><label>O Best Moves:</label><span class="Move-best"></span><input type="number" id="blackBest" value="0" min="0"></div>
+      <span id="whiteBest-warning" class="warning"></span>
+      <span id="blackBest-warning" class="warning"></span>
+
+      <div><label>X Great Moves:</label><span class="Move-great"></span><input type="number" id="whiteGreat" value="0" min="0"></div>
+      <div><label>O Great Moves:</label><span class="Move-great"></span><input type="number" id="blackGreat" value="0" min="0"></div>
+      <span id="whiteGreat-warning" class="warning"></span>
+      <span id="blackGreat-warning" class="warning"></span>
+
+      <div><label>X Brilliant Moves:</label><span class="Move-brilliant"></span><input type="number" id="whiteBrilliant" value="0" min="0"></div>
+      <div><label>O Brilliant Moves:</label><span class="Move-brilliant"></span><input type="number" id="blackBrilliant" value="0" min="0"></div>
+      <span id="whiteBrilliant-warning" class="warning"></span>
+      <span id="blackBrilliant-warning" class="warning"></span>
+
+      <div><label>X Magnificent Moves:</label><span class="Move-magnificent"></span><input type="number" id="whiteMagnificent" value="0" min="0"></div>
+      <div><label>O Magnificent Moves:</label><span class="Move-magnificent"></span><input type="number" id="blackMagnificent" value="0" min="0"></div>
+      <span id="whiteMagnificent-warning" class="warning"></span>
+      <span id="blackMagnificent-warning" class="warning"></span>
+
+      <div><label>X Legendary Moves:</label><span class="Move-legendary"></span><input type="number" id="whiteLegendary" value="0" min="0"></div>
+      <div><label>O Legendary Moves:</label><span class="Move-legendary"></span><input type="number" id="blackLegendary" value="0" min="0"></div>
+      <span id="whiteLegendary-warning" class="warning"></span>
+      <span id="blackLegendary-warning" class="warning"></span>
+
+    </div>
+
+
+    <div id="eloOutput"></div>
+  </div>
+
+<script>
+  document.getElementById('calculateBtn').addEventListener('click', calculateEloCustom);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+  document.getElementById('ratingA').addEventListener('input', (e) => validateInput(e.target, 1, 9999, 'ratingA-warning'));
+  document.getElementById('ratingB').addEventListener('input', (e) => validateInput(e.target, 1, 9999, 'ratingB-warning'));
+
+  document.getElementById('kFactorA').addEventListener('input', (e) => validateInput(e.target, 10, 40, 'kFactorA-warning'));
+  document.getElementById('kFactorB').addEventListener('input', (e) => validateInput(e.target, 10, 40, 'kFactorB-warning'));
+
+  function validateInput(input, min, max, warningId) {
+    const value = parseFloat(input.value);
+    const warningElement = document.getElementById(warningId);
+    if (isNaN(value) || value < min || value > max) {
+      warningElement.textContent = `Value must be between ${min} and ${max}.`;
+      warningElement.style.display = 'block';
+      input.dataset.isValid = 'false';
+    } else {
+      warningElement.textContent = '';
+      warningElement.style.display = 'none';
+      input.dataset.isValid = 'true';
+    }
+  }
+
+  function calculateEloCustom() {
+    const ratingA = parseFloat(document.getElementById('ratingA').value);
+    const ratingB = parseFloat(document.getElementById('ratingB').value);
+    const kFactorA = parseFloat(document.getElementById('kFactorA').value);
+    const kFactorB = parseFloat(document.getElementById('kFactorB').value);
+    const result = document.getElementById('result').value;
+
+    const inputsAreValid = Array.from(document.querySelectorAll('.player-inputs input')).every(input => input.dataset.isValid !== 'false');
+    if (!inputsAreValid) {
+      alert("Please correct the invalid input values before calculating.");
+      return;
+    }
+
+    const expectedScoreA = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400));
+    const expectedScoreB = 1 / (1 + Math.pow(10, (ratingA - ratingB) / 400));
+
+    let actualScoreA, actualScoreB;
+    if (result === 'winA') { actualScoreA = 1; actualScoreB = 0; }
+    else if (result === 'winB') { actualScoreA = 0; actualScoreB = 1; }
+    else { actualScoreA = 0.5; actualScoreB = 0.5; }
+
+    const avgRating = (ratingA + ratingB) / 2;
+    const factorA = Math.pow(Math.abs(avgRating), kFactorA / 50);
+    const factorB = Math.pow(Math.abs(avgRating), kFactorB / 50);
+
+    const newRatingA = Math.max(1, Math.min(9999, ratingA + factorA * (actualScoreA - expectedScoreA)));
+    const newRatingB = Math.max(1, Math.min(9999, ratingB + factorB * (actualScoreB - expectedScoreB)));
+
+    document.getElementById('newRatingA').textContent = newRatingA.toFixed(0);
+    document.getElementById('newRatingB').textContent = newRatingB.toFixed(0);
+
+    updateDisplay();
+  }
+
+  function resetForm() {
+    document.getElementById('ratingA').value = 2500;
+    document.getElementById('ratingB').value = 2500;
+    document.getElementById('result').value = 'winA';
+    document.getElementById('newRatingA').textContent = '';
+    document.getElementById('newRatingB').textContent = '';
+
+    document.querySelectorAll('.move-inputs input').forEach(inp => inp.value = 0);
+
+
+    updateDisplay();
+  }
+
+  function calculateEQ(blunders, mistakes, inaccuracies, good, best, great, brilliant, magnificent, legendary) {
+    const totalMoves = blunders + mistakes + inaccuracies + good + best + great + brilliant + magnificent + legendary;
+    if (totalMoves === 0) return 100;
+    const score =
+      blunders * 0 +
+      mistakes * 50 +
+      inaccuracies * 65 +
+      good * 80 +
+      best * 100 +
+      great * 120 +
+      brilliant * 150 +
+      magnificent * 200 +
+      legendary * 250;
+    return (score / totalMoves);
+  }
+
+  function calculatePerformanceELO(EQ, avgRating) {
+    const perf = avgRating * (EQ / 100);
+    return Math.min(Math.max(Math.round(perf), 1), 9999);
+  }
+
+  function getEQSymbol(eq) {
+    if (eq < 50) return { symbol: "??", class: "eq-blunder" };
+    if (eq < 65) return { symbol: "?", class: "eq-mistake" };
+    if (eq < 80) return { symbol: "?!", class: "eq-inaccuracy" };
+    if (eq < 100) return { symbol: "✓", class: "eq-good" };
+    if (eq < 120) return { symbol: "★", class: "eq-best" };
+    if (eq < 150) return { symbol: "!", class: "eq-great" };
+    if (eq < 200) return { symbol: "!!", class: "eq-brilliant" };
+    if (eq < 250) return { symbol: "!!!", class: "eq-magnificent" };
+    return { symbol: "!!!!", class: "eq-legendary" };
+  }
+
+  function updateDisplay() {
+    const whiteELO = parseInt(document.getElementById("ratingA").value);
+    const blackELO = parseInt(document.getElementById("ratingB").value);
+
+    const whiteEQ = calculateEQ(
+      +document.getElementById("whiteBlunders").value,
+      +document.getElementById("whiteMistakes").value,
+      +document.getElementById("whiteInaccuracies").value,
+      +document.getElementById("whiteGood").value,
+      +document.getElementById("whiteBest").value,
+      +document.getElementById("whiteGreat").value,
+      +document.getElementById("whiteBrilliant").value,
+      +document.getElementById("whiteMagnificent").value,
+      +document.getElementById("whiteLegendary").value
+    );
+
+    const blackEQ = calculateEQ(
+      +document.getElementById("blackBlunders").value,
+      +document.getElementById("blackMistakes").value,
+      +document.getElementById("blackInaccuracies").value,
+      +document.getElementById("blackGood").value,
+      +document.getElementById("blackBest").value,
+      +document.getElementById("blackGreat").value,
+      +document.getElementById("blackBrilliant").value,
+      +document.getElementById("blackMagnificent").value,
+      +document.getElementById("blackLegendary").value
+    );
+
+    const whitePerfELO = calculatePerformanceELO(whiteEQ, whiteELO);
+    const blackPerfELO = calculatePerformanceELO(blackEQ, blackELO);
+
+    const whiteEQData = getEQSymbol(whiteEQ);
+    const blackEQData = getEQSymbol(blackEQ);
+
+    eloOutput.innerHTML = `Estimated ELO Performance:<br>
+      X: ${whitePerfELO} (EQ: ${whiteEQ.toFixed(1)}) <span class="${whiteEQData.class}">${whiteEQData.symbol}</span><br>
+      O: ${blackPerfELO} (EQ: ${blackEQ.toFixed(1)}) <span class="${blackEQData.class}">${blackEQData.symbol}</span>`;
+  }
+
+  document.querySelectorAll(".move-inputs input, #ratingA, #ratingB").forEach(el => {
+    el.addEventListener("input", updateDisplay);
+  });
+
+  document.querySelectorAll('.move-inputs input[type="number"]').forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.value < 0) {
+        input.value = 0;
+      }
+    });
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
