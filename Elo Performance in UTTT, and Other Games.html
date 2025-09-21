@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elo Comparison Tool</title>
+  <title>Elo Comparison Tool In Ultimate Tic Tac Toe</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
   <style>
     body {
@@ -97,7 +97,21 @@
       font-weight: bold;
     }
 
-    .warning { color: #808080; font-size: 12px; display: none; }
+    .warning { color: #800; font-size: 12px; display: none; }
+
+    /* Rank Colors */
+    .rank-noob { color: #a08000; text-shadow: 0 0 10px #a08000 }       /* Gray */
+    .rank-beginner { color: #808080; text-shadow: 0 0 10px #808080; } /* Orange */
+    .rank-novice { color: #ff8080; text-shadow: 0 0 10px #ff8080; }   /* Yellow */
+    .rank-intermediate { color: #bbf; text-shadow: 0 0 10px #bbf; } /* Green */
+    .rank-advanced { color: #ffff00; text-shadow: 0 0 10px #ffff00; } /* Cyan */
+    .rank-expert { color: #0080ff; text-shadow: 0 0 10px #0080ff; }   /* Blue */
+    .rank-elite { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }    /* Magenta */
+    .rank-master { color: lime; text-shadow: 0 0 10px lime; }   /* Red */
+    .rank-grandmaster { color: blue; text-shadow: 0 0 10px blue; }    /* Gold */
+    .rank-supergrandmaster { color: #f00; text-shadow: 0 0 10px #f00; } /* Pink */
+    .rank-legendary { color: #00ffff; text-shadow: 0 0 10px #0ff; } /* White glow */
+
 
     /* EQ classes */
     .eq-blunder { color: #ff0000; }
@@ -146,6 +160,12 @@
       gap: 15px;
       margin-top: 20px;
     }
+    .level-text {
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
   </style>
 </head>
 <body>
@@ -158,6 +178,7 @@
       <div>
         <label class="player-a-text">Player X Elo (1-9999):</label>
         <input type="number" id="ratingA" value="2500" min="1" max="9999">
+        <span id="ratingALevel" class="level-text rank-expert">[Expert]</span> <!-- NEW -->
         <label class="player-a-text">K Factor X:</label>
         <input type="number" id="kFactorA" value="20" min="10" max="40">
         <span id="ratingA-warning" class="warning"></span>
@@ -167,6 +188,7 @@
       <div>
         <label class="player-b-text">Player O Elo (1-9999):</label>
         <input type="number" id="ratingB" value="2500" min="1" max="9999">
+        <span id="ratingBLevel" class="level-text rank-expert">[Expert]</span> <!-- NEW -->
         <label class="player-b-text">K Factor O:</label>
         <input type="number" id="kFactorB" value="20" min="10" max="40">
         <span id="ratingB-warning" class="warning"></span>
@@ -188,8 +210,8 @@
 
     <div class="result-group">
       <h3>New Ratings:</h3>
-      <p><span class="player-a-text">X Elo:</span> <span id="newRatingA"></span></p>
-      <p><span class="player-b-text">O Elo:</span> <span id="newRatingB"></span></p>
+      <p><span class="player-a-text">X Elo:</span> <span id="newRatingA"></span><span id="newRatingALevel" class="level-text"></span></p>
+      <p><span class="player-b-text">O Elo:</span> <span id="newRatingB"></span><span id="newRatingBLevel" class="level-text"></span></p>
     </div>
 
     <hr>
@@ -257,6 +279,31 @@
   document.getElementById('kFactorA').addEventListener('input', (e) => validateInput(e.target, 10, 40, 'kFactorA-warning'));
   document.getElementById('kFactorB').addEventListener('input', (e) => validateInput(e.target, 10, 40, 'kFactorB-warning'));
 
+  function updateInputLevels() {
+  const ratingA = parseFloat(document.getElementById('ratingA').value) || 0;
+  const ratingB = parseFloat(document.getElementById('ratingB').value) || 0;
+
+  const levelA = getLevel(ratingA);
+  const levelB = getLevel(ratingB);
+
+  const ratingALevelEl = document.getElementById('ratingALevel');
+  const ratingBLevelEl = document.getElementById('ratingBLevel');
+
+  ratingALevelEl.textContent = `[${levelA.text}]`;
+  ratingALevelEl.className = `level-text ${levelA.class}`;
+
+  ratingBLevelEl.textContent = `[${levelB.text}]`;
+  ratingBLevelEl.className = `level-text ${levelB.class}`;
+}
+
+// Call it on input change
+document.getElementById('ratingA').addEventListener('input', updateInputLevels);
+document.getElementById('ratingB').addEventListener('input', updateInputLevels);
+
+// Initialize on page load
+updateInputLevels();
+
+
   function validateInput(input, min, max, warningId) {
     const value = parseFloat(input.value);
     const warningElement = document.getElementById(warningId);
@@ -270,6 +317,22 @@
       input.dataset.isValid = 'true';
     }
   }
+
+  function getLevel(rating) {
+    if (rating < 500) return { text: "Noob", class: "rank-noob" };
+    if (rating < 1000) return { text: "Beginner", class: "rank-beginner" };
+    if (rating < 1500) return { text: "Novice", class: "rank-novice" };
+    if (rating < 2000) return { text: "Intermediate", class: "rank-intermediate" };
+    if (rating < 2500) return { text: "Advanced", class: "rank-advanced" };
+    if (rating < 3000) return { text: "Expert", class: "rank-expert" };
+    if (rating < 3500) return { text: "Elite", class: "rank-elite" };
+    if (rating < 4000) return { text: "Master", class: "rank-master" };
+    if (rating < 4500) return { text: "Grandmaster", class: "rank-grandmaster" };
+    if (rating < 5000) return { text: "Supergrandmaster", class: "rank-supergrandmaster" };
+    return { text: "Legendary", class: "rank-legendary" };
+  }
+
+
 
   function calculateEloCustom() {
     const ratingA = parseFloat(document.getElementById('ratingA').value);
@@ -301,6 +364,19 @@
 
     document.getElementById('newRatingA').textContent = newRatingA.toFixed(0);
     document.getElementById('newRatingB').textContent = newRatingB.toFixed(0);
+
+    const newALevel = getLevel(newRatingA);
+    const newBLevel = getLevel(newRatingB);
+
+    const newRatingALevelEl = document.getElementById("newRatingALevel");
+    const newRatingBLevelEl = document.getElementById("newRatingBLevel");
+
+    newRatingALevelEl.textContent = `[${newALevel.text}]`;
+    newRatingALevelEl.className = `level-text ${newALevel.class}`;
+
+    newRatingBLevelEl.textContent = `[${newBLevel.text}]`;
+    newRatingBLevelEl.className = `level-text ${newBLevel.class}`;
+
 
     updateDisplay();
   }
@@ -385,10 +461,13 @@
     const whiteEQData = getEQSymbol(whiteEQ);
     const blackEQData = getEQSymbol(blackEQ);
 
+    const whiteLevel = getLevel(whitePerfELO);
+    const blackLevel = getLevel(blackPerfELO);
+
     eloOutput.innerHTML = `Estimated ELO Performance:<br>
-      X: ${whitePerfELO} (EQ: ${whiteEQ.toFixed(1)}) <span class="${whiteEQData.class}">${whiteEQData.symbol}</span><br>
-      O: ${blackPerfELO} (EQ: ${blackEQ.toFixed(1)}) <span class="${blackEQData.class}">${blackEQData.symbol}</span>`;
-  }
+      X: ${whitePerfELO} (EQ: ${whiteEQ.toFixed(1)}) <span class="${whiteEQData.class}">${whiteEQData.symbol}</span> <span class="level-text ${whiteLevel.class}">[${whiteLevel.text}]</span><br>
+      O: ${blackPerfELO} (EQ: ${blackEQ.toFixed(1)}) <span class="${blackEQData.class}">${blackEQData.symbol}</span> <span class="level-text ${blackLevel.class}">[${blackLevel.text}]</span>`;
+    }
 
   document.querySelectorAll(".move-inputs input, #ratingA, #ratingB").forEach(el => {
     el.addEventListener("input", updateDisplay);
