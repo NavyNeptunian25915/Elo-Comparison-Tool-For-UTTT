@@ -410,8 +410,8 @@ updateInputLevels();
     return (score / totalMoves);
   }
 
-  function calculatePerformanceELO(EQ, avgRating) {
-    const perf = avgRating * (EQ / 100);
+  function calculatePerformanceELO(EQ, Rating) {
+    const perf = Rating * (EQ / 100);
     return Math.min(Math.max(Math.round(perf), 1), 9999);
   }
 
@@ -455,8 +455,8 @@ updateInputLevels();
       +document.getElementById("blackLegendary").value
     );
 
-    const whitePerfELO = calculatePerformanceELO(whiteEQ, whiteELO);
-    const blackPerfELO = calculatePerformanceELO(blackEQ, blackELO);
+    const whitePerfELO = calculatePerformanceELO(whiteEQ, blackELO);
+    const blackPerfELO = calculatePerformanceELO(blackEQ, whiteELO);
 
     const whiteEQData = getEQSymbol(whiteEQ);
     const blackEQData = getEQSymbol(blackEQ);
