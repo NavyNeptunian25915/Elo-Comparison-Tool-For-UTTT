@@ -407,11 +407,11 @@ updateInputLevels();
       brilliant * 150 +
       magnificent * 200 +
       legendary * 250;
-    return (score / totalMoves);
+    return Math.round(score / totalMoves);
   }
 
   function calculatePerformanceELO(EQ, Rating) {
-    const perf = Rating * (EQ / 100);
+    const perf = Math.min(Math.max(Rating + ((EQ - 100) * 10), 1), 9999);
     return Math.min(Math.max(Math.round(perf), 1), 9999);
   }
 
@@ -465,8 +465,8 @@ updateInputLevels();
     const blackLevel = getLevel(blackPerfELO);
 
     eloOutput.innerHTML = `Estimated ELO Performance:<br>
-      X: ${whitePerfELO} (EQ: ${whiteEQ.toFixed(1)}) <span class="${whiteEQData.class}">${whiteEQData.symbol}</span> <span class="level-text ${whiteLevel.class}">[${whiteLevel.text}]</span><br>
-      O: ${blackPerfELO} (EQ: ${blackEQ.toFixed(1)}) <span class="${blackEQData.class}">${blackEQData.symbol}</span> <span class="level-text ${blackLevel.class}">[${blackLevel.text}]</span>`;
+      X: ${whitePerfELO} (EQ: ${whiteEQ.toFixed(0)}) <span class="${whiteEQData.class}">${whiteEQData.symbol}</span> <span class="level-text ${whiteLevel.class}">[${whiteLevel.text}]</span><br>
+      O: ${blackPerfELO} (EQ: ${blackEQ.toFixed(0)}) <span class="${blackEQData.class}">${blackEQData.symbol}</span> <span class="level-text ${blackLevel.class}">[${blackLevel.text}]</span>`;
     }
 
   document.querySelectorAll(".move-inputs input, #ratingA, #ratingB").forEach(el => {
